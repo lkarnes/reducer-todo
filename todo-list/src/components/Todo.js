@@ -1,4 +1,4 @@
-import React, {useState, useReducer} from 'react';
+import React, {useState, useReducer, useEffect} from 'react';
 import {todos, todoReducer} from '../reducers/todoReducer';
 
 export default function Todo() {
@@ -7,14 +7,23 @@ export default function Todo() {
  const handleChange = e => {
     setTodo(e.target.value)
  }
+ const handleSubmit = e => {
+    e.preventDefault();
+    dispatch({type: 'ADD_TODO', payload: todo})
+    setTodo();
+ }
+
+ const handleToggle = input => {
+     dispatch({type: 'TOGGLE_COMPLETE', payload: input})
+ }
+
+ const handleDelete = () => {
+     dispatch({type: 'DELETE_COMPLETED', payload: todos})
+ }
  return (
-     <div>
+     <div className='todo-app'>
          <h1>Todo List</h1>
-         <form onSubmit={e=> {
-             e.preventDefault();
-             dispatch({type: 'ADD_TODO', payload: todo})
-             console.log(state)
-         }}>
+         <form onSubmit={handleSubmit}>
              <input
          className='todo-form'
          type='text'
@@ -22,16 +31,18 @@ export default function Todo() {
          value={!todo ? '' : todo.item}
          onChange={handleChange}
          />
-         <button className='submit-form' type='submit'>Submit</button>
+         <button className='button' type='submit'>Submit</button>
          </form>
+         <div className='todo-box'>
+             {state.map(todo => (
+                <div onClick={()=> handleToggle(todo)} className={!todo.completed ? 'incomplete todo' : 'done todo' }>
+                    <p>{todo.item}</p>
+                    <p >{!todo.completed ? 'incomplete' : 'complete'}</p>
+                </div>
+            ))}
+         </div>
          
-         {state.map(todo => (
-            <div className={!todo.completed ? 'incomplete todo' : 'done todo'}>
-                <p>{todo.item}</p>
-                <p >{!todo.completed ? 'incomplete' : 'done'}</p>
-            </div>
-            
-         ))}
+         <button className='button' onClick={handleDelete}>Clear Completed</button>
      </div>
  )
 }
